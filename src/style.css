@@ -52,7 +52,7 @@ a:-webkit-any-link {
     box-shadow: 0 4px 5px #161618;
     
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 2fr;
     grid-template-rows: 1fr;
     /*outline: #0067b8 auto;*/
 }
@@ -79,7 +79,7 @@ a:-webkit-any-link {
     color:#efefa9;
     transition: color 0.3s ease-in-out;
 }
-.header .logo a > svg:hover #bg {
+.header .logo a > svg:hover #bg, .header .logo a > svg:active #bg {
     color:#e65252;
 }
 
@@ -87,7 +87,7 @@ a:-webkit-any-link {
     color:#23222a;
     transition: color 0.3s ease-in;
 }
-.header .logo a > svg:hover #letter {
+.header .logo a > svg:hover #letter, .header .logo a > svg:active #letter {
     color:#efefa9;
 }
 
@@ -115,6 +115,7 @@ nav ul {
 
 nav > ul > li {
     display: flex;
+    white-space: nowrap;
 }
 
 nav > ul > li > a {
@@ -129,7 +130,6 @@ nav > ul > li > a:hover {
     display: flex;
 
     position: relative;
-    min-width: 515px;
     min-height: 320px;
     margin-top: var(--navHeight);
     margin-left: 8vw;
@@ -158,6 +158,9 @@ nav > ul > li > a:hover {
     width: fit-content;
     user-select: none;
 }
+.subheader > h1:first-of-type {
+  margin-right: 1rem;
+}
 
 .subheader .dynamic-word {
     transition: transform 0.3s ease-in;
@@ -173,7 +176,7 @@ nav > ul > li > a:hover {
     animation: cursor-blink 1.5s steps(2) infinite;
 }
 
-.subheader .dynamic-word:hover {
+.subheader .dynamic-word:hover, .subheader .dynamic-word:active {
     transform: translateY(-2px);
     /* radial-gradient(100% 100% at 100% 0, #5adaff 0, #5468ff 100%);*/
     background: radial-gradient(100% 100% at 100% 0, #0067b8 0, #5468ff 100%);
@@ -193,9 +196,9 @@ nav > ul > li > a:hover {
     position: relative;
     list-style-type: none;
     height: 18cqh;
-    width: 60cqw;
+    width: 80cqw;
     padding: calc(1cqw + 1cqh);
-    outline: auto;
+    box-shadow: 0 0 0 2px #efefa9;
     box-sizing: border-box;
 
     display: flex;
@@ -399,4 +402,101 @@ nav > ul > li > a:hover {
 .game-info .desc > ol > li > b{
     color: #e65252;
     font-weight: 580;
+}
+
+@media (max-width: 1100px) {
+  .mainContent {
+    margin-left: 4vw;
+    margin-right: 2vw;
+  }
+  .homepage-title h1 {
+    font-size: 3.5rem;
+  }
+}
+
+@media (max-width: 935px) {
+  .mainContent {
+    margin-left: 2vw;
+    margin-right: 1.4vw;
+  }
+  .homepage-title h1 {
+    font-size: 3rem;
+  }
+  .subheader .dynamic-word::after {
+    height: 2.4rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .mainContent {
+    margin-left: 1.5vw;
+    margin-right: 1vw;
+  }
+  .homepage-title h1 {
+    font-size: 2rem;
+  }
+  .subheader > h1:first-of-type {
+    margin-right: 0.5rem;
+  }
+  .subheader .dynamic-word::after {
+    height: 1.5rem;
+  }
+  .gamemode {
+    grid-template-columns: minmax(100px, 1fr);
+    grid-template-rows: 1fr 1fr;
+  }
+  .gamemode > a {
+    font-size: 2rem;
+    height: 15cqh;  
+  }
+}
+
+@media (max-width: 512px) {
+  nav ul {
+    gap: 0.8rem;
+  }
+  .mainContent {
+    margin-left: 1vw;
+    margin-right: 0.6vw;
+  }
+  .mainContent h1 {
+    font-size: 1.2rem;
+  }
+  .mainContent p {
+    font-size: 0.6rem;
+  }
+  .homepage-title {
+    height: calc(40vh - var(--navHeight));
+  }
+  .subheader > h1:first-of-type {
+    margin-right: 0.2rem;
+  }
+  .subheader .dynamic-word::after {
+    height: 1rem;
+    width: 4px;
+  }
+  .gamemode > a {
+    font-size: 1.4rem;
+    height: 10cqh;  
+  }
+}
+
+@media (max-width: 285px) {
+  nav ul > li > a {
+    font-size: 8px;
+  }
+  .mainContent {
+    margin-left: 0.8vw;
+    margin-right: 0.4vw;
+  }
+  .mainContent h1 {
+    font-size: 0.8rem;
+  }
+  .homepage-title {
+    height: calc(30vh - var(--navHeight));
+  }
+  .subheader .dynamic-word::after {
+    height: 0.8rem;
+    width: 2px;
+  }
 }
