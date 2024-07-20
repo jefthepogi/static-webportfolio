@@ -39,7 +39,7 @@ export default function Interface() {
 }
 
 function Homepage() {
-  const word = ["coding", "programming", "designing", "her"];
+  const word = ["CODING", "PROGRAMMING", "DESIGNING", "LEARNING"];
   const [count, setCount] = useState(0);
   return (
     <div className="mainContent flexcolumn">
@@ -47,11 +47,11 @@ function Homepage() {
         <p>Hi, my name is</p>
         <h1>JEF RUSSEL Q. MANONGAS</h1>
         <div className='subheader'>
-          <h1 style={{marginRight: "1rem"}}>I love</h1>
+          <h1>I LOVE</h1>
           <h1 class="dynamic-word" onClick={() => {
             setCount(count + 1); 
             if (count == word.length - 1  ) setCount(0);
-          }}>{word[count]}</h1>
+          }}>{word[count]}.</h1>
         </div>
         <p>Welcome to my webpage :)</p>  
       </div>

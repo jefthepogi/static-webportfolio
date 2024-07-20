@@ -83,7 +83,7 @@ export function TTT_Game() {
         <div className="game-status"><h2>{title}</h2></div>
         {flags.player === null ? (
           <div className="choose">
-            <h3>Choose:</h3>
+            <h3>CHOOSE</h3>
             <button onClick={() => dispatch({ type: "setPlayer", payload: "X" })}>X</button>
             <button onClick={() => { dispatch({ type: "setPlayer", payload: "O" }); dispatch({ type: "Toggle"}); } }>O</button>
           </div>
@@ -110,6 +110,7 @@ export function TTT_Game() {
             <li><b>Draw condition:</b> If all nine cells are filled and neither player has three in a row, the game is a draw.</li>
           </ol>
         </div>
+        <button id="reset-button" onClick={() => dispatch({ type: "resetGame"}) }>Reset</button>
       </div>
     </div>
   );
@@ -191,19 +192,16 @@ function Board(props) {
   }
   
   return (
-    <>
-      <div className="board">
-      {[...Array(len)].map((_, outerIndex) => (
-        <div key={outerIndex} className="board-row">
-          {[...Array(len)].map((_, innerIndex) => {
-            const p = outerIndex * len + innerIndex;
-            return ( <Square key={innerIndex} state={squares[p]} clicked={() => handleClick(p)}/> );  
-          })} 
-        </div>
-      ))}
+    <div className="board">
+    {[...Array(len)].map((_, outerIndex) => (
+      <div key={outerIndex} className="board-row">
+        {[...Array(len)].map((_, innerIndex) => {
+          const p = outerIndex * len + innerIndex;
+          return ( <Square key={innerIndex} state={squares[p]} clicked={() => handleClick(p)}/> );  
+        })} 
       </div>
-      <button onClick={() => props.dispatch({ type: "resetGame"}) }>Reset</button>
-    </>
+    ))}
+    </div>
   );      
 }
 
