@@ -62,7 +62,7 @@ export function TTT_Menu() {
   return (
     <div className="mainContent flexcolumn">
       <h1>Tic Tac Toe</h1>
-      <p>Version 1.0, Mid 2024</p>
+      <p>Version 1.1, Late 2024</p>
       <div className="gamemode">
         <Link to="ai">User vs AI</Link>
         <Link to="pvp">PVP</Link>
