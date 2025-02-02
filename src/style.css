@@ -338,7 +338,6 @@ nav>ul>li>a:hover {
 }
 
 .game-board .choose {
-  margin-top: 20px;
   display: flex;
   gap: 2px;
 }

@@ -1,6 +1,6 @@
 
 export const TTT = {
-  size: 0,
+  size: 9,
   X: 'X',
   O: 'O',
 
@@ -85,8 +85,8 @@ export const TTT = {
   minimax(board, d) {
     const limit = {
       "ez": 1,
-      "mid": 2,
-      "diff": 4
+      "mid": 3,
+      "diff": 20,
     };
 
     let depth = limit[d];
@@ -126,10 +126,7 @@ export const TTT = {
 
   maxVal(board, d) {
     let v = -Infinity;
-    if (d == 0)
-        return v
-    d -= 1;
-    if (this.terminal(board))
+    if (this.terminal(board) || d == 0)
       return this.utility(board);
     
     const a = this.actions(board);
@@ -139,10 +136,7 @@ export const TTT = {
   },
   minVal(board, d) {
     let v = Infinity;
-    if (d == 0)
-        return v;
-    d -= 1;
-    if (this.terminal(board))
+    if (this.terminal(board) || d == 0)
       return this.utility(board);
     
     const a = this.actions(board);
@@ -151,3 +145,9 @@ export const TTT = {
     return v
   }
 };
+
+export const KungfuChess = {
+  initState() {
+    return Array(this.size).fill(null);
+  },
+}

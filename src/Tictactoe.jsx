@@ -3,58 +3,40 @@ import { Link, useLocation } from 'react-router-dom';
 import * as algo from './Algorithm.jsx';
 
 const initialFlags = {
-  player: null,
-  status: null,
+  user: null,
+  status: "‎", // fixes layouting jumps 
   winner: null,
   difficulty: "diff",
   // Server Anchored Flags //
-  loading: false,
-  toggle: false,
-};
-
-const useIsMount = () => {
-  const isMountRef = useRef(true);
-  useEffect(() => {
-    isMountRef.current = false;
-  }, []);
-  return isMountRef.current;
+  updating: false,
 };
 
 function reducer(state, action) {
   switch (action.type) {
-    case "setStatus":
-      return {
-        ...state,
-        status: action.payload.status,
-        winner: action.payload.winner,
-      };
     case "setDifficulty":
       return {
         ...state,
         difficulty: action.payload,
       };
-    case "setPlayer":
+    case "setUser":
       return {
         ...state,
-        player: action.payload,
+        user: action.payload,
       };
-    case "setLoading":
+    case "setUpdate":
       return {
         ...state,
-        loading: action.payload,
+        updating: action.payload.updateTo,
+        status: action.payload.status,
+        winner: action.payload.winner,
       };
     case "resetGame":
       return {
         ...initialFlags,
         difficulty: state.difficulty,
-      };
-    case "Toggle":
-      return {
-        ...state,
-        toggle: !state.toggle,
-      };
+      }
     default:
-      return state 
+      return state;
   }
 }
 
@@ -73,31 +55,38 @@ export function TTT_Menu() {
 
 export function TTT_Game() {
   const [flags, dispatch] = useReducer(reducer, initialFlags);
-  let title = flags.status;
-  if (flags.loading === true) {
-    title = `AI (${flags.player}) is thinking...`
+  const playerChoseO = useRef(false);
+  const [board_key, setBoardKey] = useState(0);
+  const remountBoard = () => {
+    setBoardKey(prevKey => prevKey + 1);
+    console.log("remounted");
   }
+
+  const route = useLocation();
+  const url = route.pathname;
+  const title = flags.status;
+
   return (
     <div className="mainContent flexrow">
       <div className="game-board">
         <div className="game-status"><h2>{title}</h2></div>
-        {flags.player === null ? (
+        {(flags.user === null && url === "/games/ttt/ai") ? (
           <div className="choose">
             <h3>CHOOSE</h3>
-            <button onClick={() => dispatch({ type: "setPlayer", payload: "X" })}>X</button>
-            <button onClick={() => { dispatch({ type: "setPlayer", payload: "O" }); dispatch({ type: "Toggle"}); } }>O</button>
+            <button onClick={() => { dispatch({ type: "setUser", payload: "X" }); playerChoseO.current = false; }}>X</button>
+            <button onClick={() => { dispatch({ type: "setUser", payload: "O" }); playerChoseO.current = true; }}>O</button>
           </div>
         ) : (
-          <Board flags={flags} dispatch={dispatch}/>
+          <Board key={board_key} flags={flags} dispatch={dispatch} url={url} chosen={playerChoseO}/>
         )}
       </div>
       <div className="game-info">
-        {flags.player === null &&
+        {(flags.user === null && url === "/games/ttt/ai") &&
           <div className="topbar">
             <select id="selectLevel" value={flags.difficulty} onChange={e => dispatch({ type: "setDifficulty", payload: e.target.value})}>
               <option value="ez">Easy</option>
-              <option value="mid">Medium</option>
-              <option value="diff">Hard</option>
+              <option value="mid">Hard</option>
+              <option value="diff">Impossible</option>
             </select>
           </div>
         }
@@ -110,7 +99,7 @@ export function TTT_Game() {
             <li><b>Draw condition:</b> If all nine cells are filled and neither player has three in a row, the game is a draw.</li>
           </ol>
         </div>
-        <button id="reset-button" onClick={() => dispatch({ type: "resetGame"}) }>Reset</button>
+        <button id="reset-button" onClick={() => { dispatch({ type: "resetGame"}); if (url === "/games/ttt/pvp") { remountBoard(); } } }>Reset</button>
       </div>
     </div>
   );
@@ -125,21 +114,21 @@ function Square({state, clicked}) {
 }
 
 function Board(props) {
-
   const len = 3;
-  algo.TTT.size = len * len;
-  const route = useLocation();
   const [squares, setSquares] = useState(algo.TTT.initState());
-  const url = route.pathname;
-  const isMount = useIsMount();
+  const squaresRef = useRef(squares);
+  const executedRef = useRef(false);
 
   const fetchData = async () => {
-    props.dispatch({ type: "setLoading", payload: true });
+
+    props.dispatch({ type: "setUpdate", payload: { updateTo: true, status: "The AI is thinking...", winner: null } });
     await sleep(300);
-    const user = props.flags.player;
+
+    const user = props.flags.user;
     const depth = props.flags.difficulty;
-    let board = squares.slice();
-    const _player = algo.TTT.player(board);
+    let board = squaresRef.current.slice();
+    const turn = algo.TTT.player(board);
+    // Game Status 
     const is_gameover = () => {
       const _gameover = algo.TTT.terminal(board);
       let _status = `User's (${user}) turn`;
@@ -148,47 +137,81 @@ function Board(props) {
         if (_winner == null) _status = "Game Draw.";
         else {
           let p = "AI";
-          if (user == _winner) p = "User";
+          if (user == _winner) { p = "User" };
           _status = `${p} (${_winner}) has won!`;
         }
       }
       return [_gameover, _status, _winner];
     }
-    // Game Status 
+
+    // console.log(squaresRef.current);
     let [game_over, status, winner] = is_gameover();
-    // Check for AI move
-    if (user !== _player && !game_over) {
-        const move = algo.TTT.minimax(board, depth);
-        board = algo.TTT.result(board, move);
-        [, status, winner] = is_gameover();
-    }
     
-    props.dispatch({ type: "setStatus", payload: {status: status, winner: winner} });
+    if (user !== turn && !game_over) {
+      // Check for AI move
+      const move = algo.TTT.minimax(board, depth);
+      board = algo.TTT.result(board, move);
+      [, status, winner] = is_gameover();
+    }
     setSquares(board);
-    props.dispatch({ type: "setLoading", payload: false });
+    squaresRef.current = board;
+    props.dispatch({ type: "setUpdate", payload: {updateTo: false, status: status, winner: winner } });
   }
 
-  if (url == "/games/ttt/ai") {
-    useEffect(() => {
-      if (props.flags.player == 'O') {
-        fetchData();
-      } else if (isMount) {
-        //console.log("Initial Render");
-      } else {
-        //console.log("Subsequent Render");
-        fetchData();
+  function switchPlayer() {
+    const board = squaresRef.current.slice();
+    const user =  algo.TTT.player(board);
+    const player = () => {
+      return user === "X" ? "Player 1" : "Player 2";
+    }
+    const _gameover = algo.TTT.terminal(board);
+    let _status = `${player()}'s (${user}) turn`;
+    const _winner = algo.TTT.winner(board);
+    if (_gameover) {
+      if (_winner == null) _status = "Game Draw.";
+      else {
+        let p = "Player 2";
+        if (user == _winner) { p = "Player 1" };
+        _status = `${p} (${_winner}) has won!`;
       }
-    }, [props.flags.toggle]);
+    }
+    props.dispatch({ type: "setUser", payload: user }); 
+    props.dispatch({ type: "setUpdate", payload: {updateTo: false, status: _status, winner: _winner } });
   }
 
   function handleClick(i) {
-    if (squares[i] || props.flags.winner != null || props.flags.loading)
+    if (squares[i] || props.flags.winner != null || props.flags.updating)
       return;
-    
     const temp = squares.slice();
-    temp[i] = props.flags.player;
+    temp[i] = props.flags.user;
     setSquares(temp);
-    props.dispatch({ type: "Toggle" });
+    squaresRef.current = temp;
+    if (props.url === "/games/ttt/ai") fetchData();
+    else if (props.url === "/games/ttt/pvp") {
+      switchPlayer();
+    }
+  }
+
+  if (props.chosen.current == true) {
+    useEffect(() => {
+      if (executedRef.current) {return;}
+      fetchData();
+      executedRef.current = true;
+      return () => {
+        executedRef.current = false;
+      }
+    }, [])
+  } else if (props.chosen.current == false) {
+    useEffect(() => {
+      if (executedRef.current) {return;}
+      props.dispatch({ type: "setUser", payload: "X" });
+      const _user = props.url === "/games/ttt/ai" ? "User" : "Player 1";
+      props.dispatch({ type: "setUpdate", payload: {updateTo: false, status: `${_user}'s (X) turn`} });
+      executedRef.current = true;
+      return () => {
+        executedRef.current = false;
+      }
+    }, [])
   }
   
   return (

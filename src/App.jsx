@@ -33,7 +33,7 @@ export default function Interface() {
           <Route index element={ <GameList/>}/>
           <Route path="ttt">
             <Route index element={ <TTT_Menu/> }/>
-            <Route path="ai" element={ <TTT_Game/>}/>
+            <Route path="*" element={ <TTT_Game/>}/>
           </Route>
         </Route>
         <Route path="*" element={
@@ -87,7 +87,7 @@ function GameList() {
       <p>Supposed list of games but I'm lazy af</p>
       <div className="list-of-games flexcolumn">
         <Link to="ttt">Tic Tac Toe</Link>
-        <Link to="wip">Kung Fu Chess</Link>
+        <Link to="kungfu-chess">Kung Fu Chess</Link>
       </div>
     </div>
   );
